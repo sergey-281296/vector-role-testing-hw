@@ -1,0 +1,3 @@
+# Vector Role
+
+Устанавливает Vector.
