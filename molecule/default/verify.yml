@@ -1,35 +1,30 @@
 ---
+# This is an example playbook to execute Ansible tests.
+
 - name: Verify
   hosts: all
-  become: true
+  gather_facts: false
   tasks:
-    - name: Check vector binary exists
-      ansible.builtin.stat:
-        path: /usr/bin/vector
-      register: vector_binary
+  - name: Example assertion
+    ansible.builtin.assert:
+      that: true
+  - name: 'Gather Local Services'
+    ansible.builtin.service_facts:
+    become: true
 
-    - name: Assert vector binary exists
-      ansible.builtin.assert:
-        that:
-          - vector_binary.stat.exists
+  - name: Get Vector version
+    command: vector --version
+    register: vector_version_output
 
-    - name: Check vector config is valid
-      ansible.builtin.command:
-        cmd: /usr/bin/vector validate --config /etc/vector/vector.toml
-      register: vector_validate
-      changed_when: false
+  - name: Read VectorService config file
+    slurp:
+      src: "/usr/lib/systemd/system/vector.service"
 
-    - name: Assert config is valid
-      ansible.builtin.assert:
-        that:
-          - vector_validate.rc == 0
+    register: vector_config
+  - name: Check Version
+    ansible.builtin.assert:
+      that: 
+        - vector_version_output.stdout == "vector 0.30.0 (x86_64-unknown-linux-gnu 38c3f0b 2023-05-22 17:38:48.655488673)"
+      success_msg : "its all ok"
+      fail_msg: "wrong version"
 
-    - name: Check vector service is running
-      ansible.builtin.systemd:
-        name: vector
-      register: vector_service
-
-    - name: Assert vector service is running
-      ansible.builtin.assert:
-        that:
-          - vector_service.status.ActiveState == "active"
