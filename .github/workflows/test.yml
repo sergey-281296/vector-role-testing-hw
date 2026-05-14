@@ -11,6 +11,8 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install molecule molecule-docker molecule-podman
+        run: |
+          pip install --upgrade pip
+          pip install 'molecule==6.0.0' 'molecule-docker==2.0.0' 'ansible==7.5.0' 'docker==6.0.1'
       - name: Run molecule test
         run: molecule test
