@@ -1,9 +1,13 @@
 ---
 driver:
-  name: podman
+  name: docker
 platforms:
-  - name: ubuntu
-    image: ubuntu:22.04
+  - name: instance-ubuntu
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+  - name: instance-oraclelinux
+    image: geerlingguy/docker-oraclelinux8-ansible:latest
+    pre_build_image: true
 provisioner:
   name: ansible
 verifier:
