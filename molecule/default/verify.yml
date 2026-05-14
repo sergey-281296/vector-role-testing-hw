@@ -1,0 +1,35 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check vector binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/vector
+      register: vector_binary
+
+    - name: Assert vector binary exists
+      ansible.builtin.assert:
+        that:
+          - vector_binary.stat.exists
+
+    - name: Check vector config is valid
+      ansible.builtin.command:
+        cmd: /usr/bin/vector validate --config /etc/vector/vector.toml
+      register: vector_validate
+      changed_when: false
+
+    - name: Assert config is valid
+      ansible.builtin.assert:
+        that:
+          - vector_validate.rc == 0
+
+    - name: Check vector service is running
+      ansible.builtin.systemd:
+        name: vector
+      register: vector_service
+
+    - name: Assert vector service is running
+      ansible.builtin.assert:
+        that:
+          - vector_service.status.ActiveState == "active"
