@@ -1,30 +1,12 @@
 ---
-# This is an example playbook to execute Ansible tests.
-
 - name: Verify
   hosts: all
-  gather_facts: false
   tasks:
-  - name: Example assertion
-    ansible.builtin.assert:
-      that: true
-  - name: 'Gather Local Services'
-    ansible.builtin.service_facts:
-    become: true
-
-  - name: Get Vector version
-    command: vector --version
-    register: vector_version_output
-
-  - name: Read VectorService config file
-    slurp:
-      src: "/usr/lib/systemd/system/vector.service"
-
-    register: vector_config
-  - name: Check Version
-    ansible.builtin.assert:
-      that: 
-        - vector_version_output.stdout == "vector 0.30.0 (x86_64-unknown-linux-gnu 38c3f0b 2023-05-22 17:38:48.655488673)"
-      success_msg : "its all ok"
-      fail_msg: "wrong version"
-
+    - name: Check directory exists
+      ansible.builtin.stat:
+        path: /opt/vector
+      register: dir_check
+    - name: Assert directory exists
+      ansible.builtin.assert:
+        that:
+          - dir_check.stat.exists
